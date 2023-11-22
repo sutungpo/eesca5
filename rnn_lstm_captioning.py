@@ -453,10 +453,6 @@ class CaptioningRNN(nn.Module):
         ######################################################################
         # Replace "pass" statement with your code
         self.encoder = ImageEncoder(pretrained=image_encoder_pretrained)
-        # self.feat_project = nn.Sequential(
-        #    nn.AdaptiveAvgPool2d((1, 1)),
-        #    nn.Linear(self.encoder.out_channels, hidden_dim),
-        # )
         self.feat_project = nn.Sequential(
             nn.AdaptiveAvgPool2d((1, 1)),
             nn.Flatten(),
@@ -526,7 +522,7 @@ class CaptioningRNN(nn.Module):
         hn = self.rnn(x, h0)
         scores = self.output_project(hn)
         loss = temporal_softmax_loss(scores, captions_out, self.ignore_index)
-        #############################################s#########################
+        #############################################s########################
         #                           END OF YOUR CODE                         #
         ######################################################################
 
@@ -587,7 +583,15 @@ class CaptioningRNN(nn.Module):
         # would both be A.mean(dim=(2, 3)).
         #######################################################################
         # Replace "pass" statement with your code
-        pass
+        prev_h = self.feat_project(self.encoder(images))
+        captions[:, 0] = self._start
+        for t in range(max_length - 1):
+            x = self.embedding(captions[:, t])
+            next_h = self.rnn.step_forward(x, prev_h)
+            scores = self.output_project(next_h)
+            captions_idx = torch.argmax(scores, dim=1)
+            captions[:, t + 1] = captions_idx
+            prev_h = next_h
         ######################################################################
         #                           END OF YOUR CODE                         #
         ######################################################################
@@ -648,7 +652,10 @@ class LSTM(nn.Module):
         ######################################################################
         next_h, next_c = None, None
         # Replace "pass" statement with your code
-        pass
+        a = torch.mm(x, self.Wx) + torch.mm(prev_h, self.Wh) + self.b
+        ai, af, ao, ag = torch.chunk(a, 4, dim=1)
+        next_c = torch.sigmoid(af) * prev_c + torch.sigmoid(ai) * torch.tanh(ag)
+        next_h = torch.sigmoid(ao) * torch.tanh(next_c)
         ######################################################################
         #                           END OF YOUR CODE                         #
         ######################################################################
@@ -680,7 +687,14 @@ class LSTM(nn.Module):
         ######################################################################
         hn = None
         # Replace "pass" statement with your code
-        pass
+        T = x.shape[1]
+        prev_c = c0
+        prev_h = h0
+        h_list = []
+        for t in range(T):
+            prev_h, prev_c = self.step_forward(x[:, t], prev_h, prev_c)
+            h_list.append(prev_h)
+        hn = torch.stack(h_list, dim=1)
         ######################################################################
         #                           END OF YOUR CODE                         #
         ######################################################################
