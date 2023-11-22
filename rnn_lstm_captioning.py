@@ -584,14 +584,18 @@ class CaptioningRNN(nn.Module):
         #######################################################################
         # Replace "pass" statement with your code
         prev_h = self.feat_project(self.encoder(images))
+        prev_c = torch.zeros(N, prev_h.shape[1]).to(images)
         captions[:, 0] = self._start
         for t in range(max_length - 1):
             x = self.embedding(captions[:, t])
-            next_h = self.rnn.step_forward(x, prev_h)
+            if self.cell_type == "rnn":
+                next_h = self.rnn.step_forward(x, prev_h)
+            elif self.cell_type == "lstm":
+                next_h, next_c = self.rnn.step_forward(x, prev_h, prev_c)
             scores = self.output_project(next_h)
             captions_idx = torch.argmax(scores, dim=1)
             captions[:, t + 1] = captions_idx
-            prev_h = next_h
+            prev_h, prev_c = next_h, next_c
         ######################################################################
         #                           END OF YOUR CODE                         #
         ######################################################################
