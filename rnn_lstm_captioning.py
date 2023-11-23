@@ -602,7 +602,8 @@ class CaptioningRNN(nn.Module):
             elif self.cell_type == "lstm":
                 next_h, next_c = self.rnn.step_forward(x, prev_h, prev_c)
             else:
-                attn = dot_product_attention(prev_h, A)
+                attn, attn_weights = dot_product_attention(prev_h, A)
+                attn_weights_all[:, t] = attn_weights
                 next_h, next_c = self.rnn.step_forward(x, prev_h, prev_c, attn)
             scores = self.output_project(next_h)
             captions_idx = torch.argmax(scores, dim=1)
