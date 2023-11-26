@@ -292,24 +292,21 @@ class SelfAttention(nn.Module):
         self.q = nn.Linear(dim_in, dim_q)
         self.k = nn.Linear(dim_in, dim_q)
         self.v = nn.Linear(dim_in, dim_v)
-        # torch.nn.init.uniform_(
-        #    self.q.weight,
-        #    a=-((6 / (dim_in + dim_q)) ** 0.5),
-        #    b=(6 / (dim_in + dim_q)) ** 0.5,
-        # )
-        # torch.nn.init.uniform_(
-        #    self.k.weight,
-        #    a=-((6 / (dim_in + dim_q)) ** 0.5),
-        #    b=(6 / (dim_in + dim_q)) ** 0.5,
-        # )
-        # torch.nn.init.uniform_(
-        #    self.v.weight,
-        #    a=-((6 / (dim_in + dim_v)) ** 0.5),
-        #    b=(6 / (dim_in + dim_v)) ** 0.5,
-        # )
-        nn.init.xavier_uniform_(self.q.weight)
-        nn.init.xavier_uniform_(self.k.weight)
-        nn.init.xavier_uniform_(self.v.weight)
+        torch.nn.init.uniform_(
+           self.q.weight,
+           a=-((6 / (dim_in + dim_q)) ** 0.5),
+           b=(6 / (dim_in + dim_q)) ** 0.5,
+        )
+        torch.nn.init.uniform_(
+           self.k.weight,
+           a=-((6 / (dim_in + dim_q)) ** 0.5),
+           b=(6 / (dim_in + dim_q)) ** 0.5,
+        )
+        torch.nn.init.uniform_(
+           self.v.weight,
+           a=-((6 / (dim_in + dim_v)) ** 0.5),
+           b=(6 / (dim_in + dim_v)) ** 0.5,
+        )
         ##########################################################################
         #               END OF YOUR CODE                                         #
         ##########################################################################
@@ -403,12 +400,11 @@ class MultiHeadAttention(nn.Module):
             [SelfAttention(dim_in, dim_out, dim_out) for i in range(num_heads)]
         )
         self.output = nn.Linear(dim_out * num_heads, dim_in)
-        # torch.nn.init.uniform_(
-        #    self.output.weight,
-        #    a=-((6 / (dim_in + dim_out)) ** 0.5),
-        #    b=(6 / (dim_in + dim_in)) ** 0.5,
-        # )
-        nn.init.xavier_normal_(self.output.weight)
+        torch.nn.init.uniform_(
+            self.output.weight,
+            a=-((6 / (dim_in + dim_out)) ** 0.5),
+            b=(6 / (dim_in + dim_in)) ** 0.5,
+        )
         ##########################################################################
         #               END OF YOUR CODE                                         #
         ##########################################################################
@@ -563,18 +559,16 @@ class FeedForwardBlock(nn.Module):
         self.input = nn.Linear(inp_dim, hidden_dim_feedforward)
         self.relu = nn.ReLU()
         self.output = nn.Linear(hidden_dim_feedforward, inp_dim)
-        nn.init.xavier_normal_(self.input.weight)
-        nn.init.xavier_normal_(self.output.weight)
-        # torch.nn.init.uniform_(
-        #    self.input.weight,
-        #    a=-((6 / (inp_dim + hidden_dim_feedforward)) ** 0.5),
-        #    b=(6 / (inp_dim + hidden_dim_feedforward)) ** 0.5,
-        # )
-        # torch.nn.init.uniform_(
-        #    self.output.weight,
-        #    a=-((6 / (inp_dim + hidden_dim_feedforward)) ** 0.5),
-        #    b=(6 / (inp_dim + hidden_dim_feedforward)) ** 0.5,
-        # )
+        torch.nn.init.uniform_(
+            self.input.weight,
+            a=-((6 / (inp_dim + hidden_dim_feedforward)) ** 0.5),
+            b=(6 / (inp_dim + hidden_dim_feedforward)) ** 0.5,
+        )
+        torch.nn.init.uniform_(
+            self.output.weight,
+            a=-((6 / (inp_dim + hidden_dim_feedforward)) ** 0.5),
+            b=(6 / (inp_dim + hidden_dim_feedforward)) ** 0.5,
+        )
         ##########################################################################
         #               END OF YOUR CODE                                         #
         ##########################################################################
@@ -672,10 +666,8 @@ class EncoderBlock(nn.Module):
         ##########################################################################
         # Replace "pass" statement with your code
         self.multihead = MultiHeadAttention(num_heads, emb_dim, emb_dim // num_heads)
-        # self.norm1 = LayerNormalization(emb_dim)
-        # self.norm2 = LayerNormalization(emb_dim)
-        self.norm1 = nn.LayerNorm(emb_dim)
-        self.norm2 = nn.LayerNorm(emb_dim)
+        self.norm1 = LayerNormalization(emb_dim)
+        self.norm2 = LayerNormalization(emb_dim)
         self.dropout = nn.Dropout(dropout)
         self.ffd = FeedForwardBlock(emb_dim, feedforward_dim)
         ##########################################################################
