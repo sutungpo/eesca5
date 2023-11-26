@@ -729,7 +729,9 @@ def get_subsequent_mask(seq):
     #                                                                             #
     ###############################################################################
     # Replace "pass" statement with your code
-    pass
+    N, K = seq.shape
+    mask = (torch.ones(K, K).to(seq)).triu(diagonal=1).bool()
+    mask = mask.unsqueeze(0).expand(N, -1, -1)
     ##############################################################################
     #               END OF YOUR CODE                                             #
     ##############################################################################
@@ -815,7 +817,17 @@ class DecoderBlock(nn.Module):
         ##########################################################################
 
         # Replace "pass" statement with your code
-        pass
+        self.attention_self = MultiHeadAttention(
+            num_heads, emb_dim, emb_dim // num_heads
+        )
+        self.attention_cross = MultiHeadAttention(
+            num_heads, emb_dim, emb_dim // num_heads
+        )
+        self.feed_forward = FeedForwardBlock(emb_dim, feedforward_dim)
+        self.norm1 = LayerNormalization(emb_dim)
+        self.norm2 = LayerNormalization(emb_dim)
+        self.norm3 = LayerNormalization(emb_dim)
+        self.dropout = nn.Dropout(dropout)
         ##########################################################################
         #               END OF YOUR CODE                                         #
         ##########################################################################
@@ -842,7 +854,12 @@ class DecoderBlock(nn.Module):
         # pass. Don't forget to apply the residual connections for different layers.
         ##########################################################################
         # Replace "pass" statement with your code
-        pass
+        x = self.attention_self(dec_inp, dec_inp, dec_inp, mask)
+        x = self.dropout(self.norm1(x + dec_inp))
+        out1 = self.attention_cross(x, enc_inp, enc_inp)
+        x = self.dropout(self.norm2(x + out1))
+        out2 = self.feed_forward(x)
+        y = self.dropout(self.norm3(x + out2))
         ##########################################################################
         #               END OF YOUR CODE                                         #
         ##########################################################################
