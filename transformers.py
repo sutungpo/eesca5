@@ -665,8 +665,7 @@ class EncoderBlock(nn.Module):
         # 4. A Dropout layer with given dropout parameter                        #
         ##########################################################################
         # Replace "pass" statement with your code
-        # self.multihead = MultiHeadAttention(num_heads, emb_dim, emb_dim // num_heads)
-        self.multihead = MultiHeadAttention(num_heads, emb_dim, emb_dim)
+        self.multihead = MultiHeadAttention(num_heads, emb_dim, emb_dim // num_heads)
         self.norm1 = LayerNormalization(emb_dim)
         self.norm2 = LayerNormalization(emb_dim)
         self.dropout = nn.Dropout(dropout)
