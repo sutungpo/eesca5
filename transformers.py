@@ -293,19 +293,19 @@ class SelfAttention(nn.Module):
         self.k = nn.Linear(dim_in, dim_q)
         self.v = nn.Linear(dim_in, dim_v)
         torch.nn.init.uniform_(
-           self.q.weight,
-           a=-((6 / (dim_in + dim_q)) ** 0.5),
-           b=(6 / (dim_in + dim_q)) ** 0.5,
+            self.q.weight,
+            a=-((6 / (dim_in + dim_q)) ** 0.5),
+            b=(6 / (dim_in + dim_q)) ** 0.5,
         )
         torch.nn.init.uniform_(
-           self.k.weight,
-           a=-((6 / (dim_in + dim_q)) ** 0.5),
-           b=(6 / (dim_in + dim_q)) ** 0.5,
+            self.k.weight,
+            a=-((6 / (dim_in + dim_q)) ** 0.5),
+            b=(6 / (dim_in + dim_q)) ** 0.5,
         )
         torch.nn.init.uniform_(
-           self.v.weight,
-           a=-((6 / (dim_in + dim_v)) ** 0.5),
-           b=(6 / (dim_in + dim_v)) ** 0.5,
+            self.v.weight,
+            a=-((6 / (dim_in + dim_v)) ** 0.5),
+            b=(6 / (dim_in + dim_v)) ** 0.5,
         )
         ##########################################################################
         #               END OF YOUR CODE                                         #
@@ -665,7 +665,8 @@ class EncoderBlock(nn.Module):
         # 4. A Dropout layer with given dropout parameter                        #
         ##########################################################################
         # Replace "pass" statement with your code
-        self.multihead = MultiHeadAttention(num_heads, emb_dim, emb_dim // num_heads)
+        # self.multihead = MultiHeadAttention(num_heads, emb_dim, emb_dim // num_heads)
+        self.multihead = MultiHeadAttention(num_heads, emb_dim, emb_dim)
         self.norm1 = LayerNormalization(emb_dim)
         self.norm2 = LayerNormalization(emb_dim)
         self.dropout = nn.Dropout(dropout)
