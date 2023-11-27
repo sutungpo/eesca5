@@ -972,7 +972,7 @@ def position_encoding_simple(K: int, M: int) -> Tensor:
     # times to create a tensor of the required output shape                      #
     ##############################################################################
     # Replace "pass" statement with your code
-    pass
+    y = (torch.arange(0, K, 1) / K).unsqueeze(1).expand(-1, M).unsqueeze(0)
     ##############################################################################
     #               END OF YOUR CODE                                             #
     ##############################################################################
@@ -999,7 +999,15 @@ def position_encoding_sinusoid(K: int, M: int) -> Tensor:
     # alternating sines and cosines along the embedding dimension M.             #
     ##############################################################################
     # Replace "pass" statement with your code
-    pass
+    pos = torch.arange(0, K, dtype=torch.float32).unsqueeze(1)
+    coeff = 1 / (
+        (10000)
+        ** (2 * (torch.arange(0, M, dtype=torch.float32).unsqueeze(0) // 2) // M)
+    )
+    y = pos * coeff
+    y[:, 0::2] = torch.sin(y[:, 0::2])
+    y[:, 1::2] = torch.cos(y[:, 1::2])
+    y = y.unsqueeze(0)
     ##############################################################################
     #               END OF YOUR CODE                                             #
     ##############################################################################
@@ -1049,7 +1057,7 @@ class Transformer(nn.Module):
         # name of this layer as self.emb_layer                                   #
         ##########################################################################
         # Replace "pass" statement with your code
-        pass
+        self.emb_layer = nn.Embedding(vocab_len, emb_dim)
         ##########################################################################
         #               END OF YOUR CODE                                         #
         ##########################################################################
@@ -1102,7 +1110,10 @@ class Transformer(nn.Module):
         # Hint: the mask shape will depend on the Tensor ans_b
         ##########################################################################
         # Replace "pass" statement with your code
-        pass
+        encode_out = self.encoder(q_emb_inp)
+        masked = get_subsequent_mask(ans_b[:, :-1])
+        dec_out = self.decoder(a_emb_inp, encode_out, masked)
+        dec_out = dec_out.view(-1, dec_out.size(-1))
         ##########################################################################
         #               END OF YOUR CODE                                         #
         ##########################################################################
